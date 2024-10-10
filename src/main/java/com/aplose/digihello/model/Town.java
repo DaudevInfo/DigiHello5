@@ -1,17 +1,32 @@
 package com.aplose.digihello.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+
+@Entity
 public class Town {
-	private static Long idCounter = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String name;
 	private Integer nbInhabitants;
+	@ManyToOne
+	Department department;
 	
-	
+	public Town() {}
 	public Town(String name, Integer nbInhabitants) {
 		super();
 		this.name = name;
 		this.nbInhabitants = nbInhabitants;
-		this.id=idCounter++;
+	}
+	public Town(String name, Integer nbInhabitants,Department department) {
+		super();
+		this.name = name;
+		this.nbInhabitants = nbInhabitants;
+		this.department=department;
 	}
 	
 	public Long getId() {
@@ -34,5 +49,6 @@ public class Town {
 	public void setNbInhabitants(Integer nbInhabitants) {
 		this.nbInhabitants = nbInhabitants;
 	}
+	
 
 }

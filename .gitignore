@@ -12,6 +12,7 @@ target/
 .settings
 .springBeans
 .sts4-cache
+digihello.mv.db
 
 ### IntelliJ IDEA ###
 .idea

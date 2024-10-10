@@ -4,54 +4,90 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.aplose.digihello.dao.TownDAO;
+import com.aplose.digihello.model.Department;
 import com.aplose.digihello.model.Town;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.persistence.NoResultException;
 
 
 @Service
 public class TownService {
+	@Autowired
+	TownDAO townDAO;
+	@Autowired
+	DepartmentService departmentService;
 	
-	private List<Town> towns = new ArrayList<>(Arrays.asList(new Town("Paris",2133111), new Town("Marseille", 873076), new Town("Lyon", 522250)));
-
+	@PostConstruct
+	public void init() {	
+		//first time we create some towns because db is empty...
+		townDAO.create(new Town("Paris",2133111,departmentService.findByCode("75")));
+		townDAO.create(new Town("Marseille", 873076,departmentService.findByCode("13")));
+		townDAO.create(new Town("Lyon", 522250,departmentService.findByCode("69")));
+	}
+	
 	public List<Town> getAllTowns(){
-		return this.towns;
+		return townDAO.findAll();
+	}
+	
+	public Town getTown(Long id) {
+		Town result = null;
+		try {
+			result = townDAO.find(id);
+		}catch(NoResultException nre) {
+		}
+		return result;
+	}
+	
+	public Town getTownByName(String name) {
+		Town result = null;
+		try {
+			result = townDAO.findByName(name);
+		}catch(NoResultException nre) {
+		}
+		return result;
 	}
 	
 	public boolean addTown(Town town) {
-		Town result = findTownByName(town.getName());
-		if (result!=null) {
+		try {
+			Town result = townDAO.findByName(town.getName());
 			return false;
-		}
-		this.towns.add(town);
-		return true;
+		}catch(NoResultException nre) {
+			townDAO.create(town);
+			return true;
+		}		
 	}
 	public boolean updateTown(Town town) {
-		Town result = findTownById(town.getId());
-		if (result!=null) {
+		try {
+			Town result = townDAO.find(town.getId());
 			result.setName(town.getName());
 			result.setNbInhabitants(town.getNbInhabitants());
+			townDAO.update(result);
 			return true;
+		}catch(NoResultException nre) {
+			return false;
 		}
-		return false;
 	}
 	public boolean deleteTown(Long id) {
-		Town result = findTownById(id);
-		if (result!=null) {
-			this.towns.remove(result);
+		try {
+			Town result = townDAO.find(id);
+			townDAO.deleteById(id);
 			return true;
+		}catch (NoResultException nre) {
+			return false;			
 		}
-		return false;
 	}
-	
-	private Town findTownById(Long id) {
-		Town result = this.towns.stream().filter(element -> id.equals(element.getId())).findAny().orElse(null);
-		return result;
+
+	public List<Town> findByDepartmentCodeOrderByNbInhabitantsDesc(String codeDep, Integer n) {
+		return townDAO.findByDepartmentCodeOrderByNbInhabitantsDesc(codeDep,n);
 	}
-	private Town findTownByName(String name) {
-		Town result = this.towns.stream().filter(element -> name.equals(element.getName())).findAny().orElse(null);
-		return result;
+
+	public List<Town> findByDepartmentCodeAndNbInhabitantsBetween(String codeDep, Integer min, Integer max) {
+		return townDAO.findByDepartmentCodeAndNbInhabitantsBetween(codeDep,min,max);
 	}
-	
 
 }
