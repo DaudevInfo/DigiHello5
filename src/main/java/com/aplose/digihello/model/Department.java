@@ -3,6 +3,8 @@ package com.aplose.digihello.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,6 +19,7 @@ public class Department {
 	private String name;
 	private String code;
 	@OneToMany(mappedBy = "department")
+//	@JsonIgnore
 	List<Town> towns = new ArrayList<>();
 	
 	public Department() {}

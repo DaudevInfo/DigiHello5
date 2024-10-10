@@ -27,24 +27,48 @@ public class TownController {
 	
 
 	@GetMapping
-	public List<Town> getTowns(){
+	public Iterable<Town> getTowns(){
 		return townService.getAllTowns();
 	}
 	@GetMapping("/{id}")
 	public Town getTown(@PathVariable("id") Long id) {
-		return townService.getTown(id);
+		return townService.getTown(id).get();
 	}
 	@GetMapping("/name/{name}")
 	public Town getTownByName(@PathVariable("name") String name) {
 		return townService.getTownByName(name);
 	}
-
+	@GetMapping("/nameStartingWith/{nameStart}")
+	public Iterable<Town> getTownByNameStart(@PathVariable("nameStart") String nameStart) {
+		return townService.getTownByNameStart(nameStart);
+	}
+	@GetMapping("/findByNbInhabitantsGreaterThan/{min}")
+	public Iterable<Town> getTownByNbInhabitantsGreaterThan(@PathVariable("min") Integer min) {
+		return townService.findByNbInhabitantsGreaterThan(min);
+	}
+	@GetMapping("/findByNbInhabitantsBetween/{min}/{max}")
+	public Iterable<Town> findByNbInhabitantsBetween(@PathVariable("min") Integer min,@PathVariable("max") Integer max) {
+		return townService.findByNbInhabitantsBetween(min,max);
+	}
+	@GetMapping("/findByDepartmentCodeAndNbInhabitantsGreaterThan/{codeDep}/{min}")
+	public Iterable<Town> findByDepartmentCodeAndNbInhabitantsGreaterThan(@PathVariable("codeDep")String codeDep, @PathVariable("min") Integer min) {
+		return townService.findByDepartmentCodeAndNbInhabitantsGreaterThan(codeDep,min);
+	}
+	@GetMapping("/findByDepartmentCodeAndNbInhabitantsBetween/{codeDep}/{min}/{max}")
+	public Iterable<Town> findByDepartmentCodeAndNbInhabitantsBetween(@PathVariable("codeDep")String codeDep, @PathVariable("min") Integer min,@PathVariable("max") Integer max) {
+		return townService.findByDepartmentCodeAndNbInhabitantsBetween(codeDep, min,max);
+	}
+	@GetMapping("/findByDepartmentCodeOrderByNbInhabitantsDesc/{codeDep}/{size}")
+	public Iterable<Town> findByDepartmentCodeOrderByNbInhabitantsDesc(@PathVariable("codeDep")String codeDep, @PathVariable("size") Integer size) {
+		return townService.findByDepartmentCodeOrderByNbInhabitantsDesc(codeDep,size);
+	}
+	
 	@PostMapping
 	public ResponseEntity<String> createTown(@RequestBody Town town) {
 		if (townService.addTown(town)) {
 			return new ResponseEntity<String>("Succès !",HttpStatus.OK);
 		}else {
-			return new ResponseEntity<String>("La ville existe déjà !",HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<String>("Impossible de créer la ville, elle existe déjà ou il manque le département : "+town.toString(),HttpStatus.BAD_REQUEST);
 		}
 	}
 	@PutMapping
@@ -63,19 +87,6 @@ public class TownController {
 			return new ResponseEntity<String>("La supression a échouée !",HttpStatus.BAD_REQUEST);
 		}
 	}
-	/**
-	 * Les n plus grandes villes d'un dep
-	 */
-	@GetMapping("/findByDepartmentCodeOrderByNbInhabitantsDesc/{codeDep}/{n}")
-	public List<Town> findByDepartmentCodeOrderByNbInhabitantsDesc(@PathVariable("codeDep")String codeDep, @PathVariable("n") Integer n) {
-		return townService.findByDepartmentCodeOrderByNbInhabitantsDesc(codeDep,n);
-	}
-	/**
-	 * Les villes ayant un nb d'habitants entre min et max pour un dep	 * 
-	 */
-	@GetMapping("/findByDepartmentCodeAndNbInhabitantsBetween/{codeDep}/{min}/{max}")
-	public List<Town> findByDepartmentCodeAndNbInhabitantsBetween(@PathVariable("codeDep")String codeDep, @PathVariable("min") Integer min,@PathVariable("max") Integer max) {
-		return townService.findByDepartmentCodeAndNbInhabitantsBetween(codeDep, min,max);
-	}
+	
 
 }

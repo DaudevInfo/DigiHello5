@@ -13,6 +13,7 @@ public class Town {
 	private Long id;
 	private String name;
 	private Integer nbInhabitants;
+	private Integer idRegion;
 	@ManyToOne
 	Department department;
 	
@@ -48,6 +49,18 @@ public class Town {
 	}
 	public void setNbInhabitants(Integer nbInhabitants) {
 		this.nbInhabitants = nbInhabitants;
+	}
+	public Integer getIdRegion() {
+		return idRegion;
+	}
+	public void setIdRegion(Integer idRegion) {
+		this.idRegion = idRegion;
+	}
+	public Department getDepartment() {
+		return department;
+	}
+	public void setDepartment(Department department) {
+		this.department = department;
 	}
 	
 
