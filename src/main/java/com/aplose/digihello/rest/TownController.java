@@ -6,6 +6,13 @@ import java.util.List;
 
 import com.aplose.digihello.dto.TownDto;
 import com.aplose.digihello.mapper.TownMapper;
+import com.aplose.digihello.model.Department;
+import com.aplose.digihello.service.DepartmentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +35,8 @@ public class TownController {
 	private TownService townService;
 
 	private TownMapper townMapper = new TownMapper();
+    @Autowired
+    private DepartmentService departmentService;
 
 	@GetMapping
 	public Iterable<TownDto> getTowns(){
@@ -66,9 +75,23 @@ public class TownController {
 	public Iterable<TownDto> findByDepartmentCodeOrderByNbInhabitantsDesc(@PathVariable("codeDep")String codeDep, @PathVariable("size") Integer size) {
 		return  townMapper.toDtos(townService.findByDepartmentCodeOrderByNbInhabitantsDesc(codeDep,size));
 	}
-	
+
+	@Operation(summary = "Création d'une nouvelle ville")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Retourne la liste des villes incluant la dernière ville créée",
+					content = { @Content(mediaType = "application/json",
+							schema = @Schema(implementation = TownDto.class)) }),
+			@ApiResponse(responseCode = "400", description = "Si une règle métier n'est pas respectée.",
+					content = @Content)})
 	@PostMapping
-	public ResponseEntity<String> createTown(@RequestBody Town town) {
+	public ResponseEntity<String> createTown(@RequestBody TownDto townDto) {
+		Town town= townMapper.fromDto(townDto);
+		Department department = departmentService.findByCode(townDto.getDepartmentCode());
+		if (department == null) {
+			return new ResponseEntity<String>("Impossible de créer la ville, pas de département "+townDto.getDepartmentCode(),HttpStatus.BAD_REQUEST);
+		}
+		town.setDepartment(department);
 		if (townService.addTown(town)) {
 			return new ResponseEntity<String>("Succès !",HttpStatus.OK);
 		}else {
@@ -76,10 +99,16 @@ public class TownController {
 		}
 	}
 	@PutMapping
-	public ResponseEntity<String> updateTown(@RequestBody Town town) {
+	public ResponseEntity<String> updateTown(@RequestBody TownDto townDto) {
+		Town town= townMapper.fromDto(townDto);
+		Department department = departmentService.findByCode(townDto.getDepartmentCode());
+		if (department == null) {
+			return new ResponseEntity<String>("Impossible d'update la ville, pas de département "+townDto.getDepartmentCode(),HttpStatus.BAD_REQUEST);
+		}
+
 		if (townService.updateTown(town)) {
 			return new ResponseEntity<String>("Succès !",HttpStatus.OK);
-		}else {
+		} else {
 			return new ResponseEntity<String>("La mise à jour a échouée !",HttpStatus.BAD_REQUEST);
 		}
 	}

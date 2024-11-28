@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.aplose.digihello.exception.InvalidTownException;
+import com.aplose.digihello.exception.TownNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -37,9 +39,16 @@ public class TownService {
 	}
 	
 	public boolean addTown(Town town) {
+		if (town.getNbInhabitants()< 10) {
+			throw new InvalidTownException ("Town must have 10 inhabitants");
+		}
+		if (town.getName().length() < 2) {
+			throw new InvalidTownException ("The name must contain two characters");
+		}
+
 		Town result = townRepository.findByName(town.getName());
 		if (result!=null) {
-			return false;
+			throw new InvalidTownException ("Town already exist");
 		}else {
 			townRepository.save(town);
 			return true;
@@ -65,11 +74,20 @@ public class TownService {
 	}
 
 	public Iterable<Town> getTownByNameStart(String nameStart) {
-		return townRepository.findByNameStartingWith(nameStart);
+		List<Town> towns = townRepository.findByNameStartingWith(nameStart);
+		if (towns.size() == 0) {
+			throw new TownNotFound("No town begin with " + nameStart);
+		}
+		return towns;
 	}
 
 	public Iterable<Town> findByNbInhabitantsGreaterThan(Integer min) {
-		return townRepository.findByNbInhabitantsGreaterThan(min);
+
+		List<Town> towns =  townRepository.findByNbInhabitantsGreaterThan(min);
+		if (towns.size() == 0) {
+			throw new TownNotFound("No town with more than " + min + " inhabitants");
+		}
+		return towns;
 	}
 
 	public Iterable<Town> findByNbInhabitantsBetween(Integer min, Integer max) {

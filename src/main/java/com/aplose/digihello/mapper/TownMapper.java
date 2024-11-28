@@ -23,11 +23,13 @@ public class TownMapper {
         return dto;
     }
 
-    public Town fromDto(TownDto dto, Department department) {
+    public Town fromDto(TownDto dto) {
         Town town = new Town();
+        Department department = new Department();
         town.setId(dto.getId());
         town.setName(dto.getName());
         town.setNbInhabitants(dto.getInhabitantsNb());
+        department.setCode(dto.getDepartmentCode());
         town.setDepartment(department);
         return town;
     }
@@ -39,5 +41,4 @@ public class TownMapper {
        }
        return dtos;
     }
-
-}
+    }

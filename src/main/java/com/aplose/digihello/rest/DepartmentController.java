@@ -46,7 +46,10 @@ public class DepartmentController {
 		return departmentService.findByCode(code);
 	}
 	@PutMapping
-	public ResponseEntity<String> update(@RequestBody Department department){
+	public ResponseEntity<String> update(@RequestBody DepartmentDto dtoDepartment){
+
+		Department department = departmentService.findByCode(dtoDepartment.getDepartmentCode());
+
 		if (!departmentService.update(department)) {
 			return new ResponseEntity<String>("Impossible de mettre à jour le département envoyé, il n'est pas trouvé ou n'a pas d'id : "+department.toString(),HttpStatus.BAD_REQUEST);
 		}
