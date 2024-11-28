@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.aplose.digihello.dto.TownDto;
+import com.aplose.digihello.mapper.TownMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,43 +26,45 @@ import com.aplose.digihello.service.TownService;
 public class TownController {
 	@Autowired
 	private TownService townService;
-	
+
+	private TownMapper townMapper = new TownMapper();
 
 	@GetMapping
-	public Iterable<Town> getTowns(){
-		return townService.getAllTowns();
+	public Iterable<TownDto> getTowns(){
+
+		return townMapper.toDtos(townService.getAllTowns());
 	}
 	@GetMapping("/{id}")
-	public Town getTown(@PathVariable("id") Long id) {
-		return townService.getTown(id).get();
+	public TownDto getTown(@PathVariable("id") Long id) {
+		return townMapper.toDto(townService.getTown(id).get());
 	}
 	@GetMapping("/name/{name}")
-	public Town getTownByName(@PathVariable("name") String name) {
-		return townService.getTownByName(name);
+	public TownDto getTownByName(@PathVariable("name") String name) {
+		return townMapper.toDto(townService.getTownByName(name));
 	}
 	@GetMapping("/nameStartingWith/{nameStart}")
-	public Iterable<Town> getTownByNameStart(@PathVariable("nameStart") String nameStart) {
-		return townService.getTownByNameStart(nameStart);
+	public Iterable<TownDto> getTownByNameStart(@PathVariable("nameStart") String nameStart) {
+		return  townMapper.toDtos(townService.getTownByNameStart(nameStart));
 	}
 	@GetMapping("/findByNbInhabitantsGreaterThan/{min}")
-	public Iterable<Town> getTownByNbInhabitantsGreaterThan(@PathVariable("min") Integer min) {
-		return townService.findByNbInhabitantsGreaterThan(min);
+	public Iterable<TownDto> getTownByNbInhabitantsGreaterThan(@PathVariable("min") Integer min) {
+		return  townMapper.toDtos(townService.findByNbInhabitantsGreaterThan(min));
 	}
 	@GetMapping("/findByNbInhabitantsBetween/{min}/{max}")
-	public Iterable<Town> findByNbInhabitantsBetween(@PathVariable("min") Integer min,@PathVariable("max") Integer max) {
-		return townService.findByNbInhabitantsBetween(min,max);
+	public Iterable<TownDto> findByNbInhabitantsBetween(@PathVariable("min") Integer min,@PathVariable("max") Integer max) {
+		return  townMapper.toDtos(townService.findByNbInhabitantsBetween(min,max));
 	}
 	@GetMapping("/findByDepartmentCodeAndNbInhabitantsGreaterThan/{codeDep}/{min}")
-	public Iterable<Town> findByDepartmentCodeAndNbInhabitantsGreaterThan(@PathVariable("codeDep")String codeDep, @PathVariable("min") Integer min) {
-		return townService.findByDepartmentCodeAndNbInhabitantsGreaterThan(codeDep,min);
+	public Iterable<TownDto> findByDepartmentCodeAndNbInhabitantsGreaterThan(@PathVariable("codeDep")String codeDep, @PathVariable("min") Integer min) {
+		return  townMapper.toDtos(townService.findByDepartmentCodeAndNbInhabitantsGreaterThan(codeDep,min));
 	}
 	@GetMapping("/findByDepartmentCodeAndNbInhabitantsBetween/{codeDep}/{min}/{max}")
-	public Iterable<Town> findByDepartmentCodeAndNbInhabitantsBetween(@PathVariable("codeDep")String codeDep, @PathVariable("min") Integer min,@PathVariable("max") Integer max) {
-		return townService.findByDepartmentCodeAndNbInhabitantsBetween(codeDep, min,max);
+	public Iterable<TownDto> findByDepartmentCodeAndNbInhabitantsBetween(@PathVariable("codeDep")String codeDep, @PathVariable("min") Integer min,@PathVariable("max") Integer max) {
+		return  townMapper.toDtos(townService.findByDepartmentCodeAndNbInhabitantsBetween(codeDep, min,max));
 	}
 	@GetMapping("/findByDepartmentCodeOrderByNbInhabitantsDesc/{codeDep}/{size}")
-	public Iterable<Town> findByDepartmentCodeOrderByNbInhabitantsDesc(@PathVariable("codeDep")String codeDep, @PathVariable("size") Integer size) {
-		return townService.findByDepartmentCodeOrderByNbInhabitantsDesc(codeDep,size);
+	public Iterable<TownDto> findByDepartmentCodeOrderByNbInhabitantsDesc(@PathVariable("codeDep")String codeDep, @PathVariable("size") Integer size) {
+		return  townMapper.toDtos(townService.findByDepartmentCodeOrderByNbInhabitantsDesc(codeDep,size));
 	}
 	
 	@PostMapping

@@ -19,7 +19,7 @@ public class Department {
 	private String name;
 	private String code;
 	@OneToMany(mappedBy = "department")
-//	@JsonIgnore
+	@JsonIgnore
 	List<Town> towns = new ArrayList<>();
 	
 	public Department() {}

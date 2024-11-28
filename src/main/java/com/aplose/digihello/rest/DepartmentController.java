@@ -2,6 +2,9 @@ package com.aplose.digihello.rest;
 
 import java.util.List;
 
+import com.aplose.digihello.dto.DepartmentDto;
+import com.aplose.digihello.mapper.DepartmentMapper;
+import com.aplose.digihello.mapper.TownMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +25,9 @@ import com.aplose.digihello.service.DepartmentService;
 public class DepartmentController {
 	@Autowired
 	DepartmentService departmentService;
-	
+
+	private DepartmentMapper departmentMapper = new DepartmentMapper();
+
 	@PostMapping
 	public ResponseEntity<String> create(@RequestBody Department department){
 		if(departmentService.create(department)) {
@@ -32,9 +37,9 @@ public class DepartmentController {
 		}		
 	}
 	@GetMapping
-	public List<Department> findAll(){
+	public List<DepartmentDto> findAll(){
 		
-		return departmentService.findAll();
+		return departmentService.findAll().stream().map(d->departmentMapper.toDto(d)).toList();
 	}
 	@GetMapping("/{code}")
 	public Department findByCode(@PathVariable String code){
