@@ -1,5 +1,6 @@
 package com.aplose.digihello.rest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,11 +9,18 @@ import com.aplose.digihello.dto.TownDto;
 import com.aplose.digihello.mapper.TownMapper;
 import com.aplose.digihello.model.Department;
 import com.aplose.digihello.service.DepartmentService;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfWriter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +35,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.aplose.digihello.model.Town;
 import com.aplose.digihello.service.TownService;
+
+
 
 @RestController
 @RequestMapping("/town")
@@ -79,7 +89,7 @@ public class TownController {
 	@Operation(summary = "Création d'une nouvelle ville")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",
-					description = "Retourne la liste des villes incluant la dernière ville créée",
+					description = "Ajoute une nouvelle ville",
 					content = { @Content(mediaType = "application/json",
 							schema = @Schema(implementation = TownDto.class)) }),
 			@ApiResponse(responseCode = "400", description = "Si une règle métier n'est pas respectée.",
@@ -120,6 +130,25 @@ public class TownController {
 			return new ResponseEntity<String>("La supression a échouée !",HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
+
+	@GetMapping("/findByNbInhabitantsGreaterThan/{min}/csv")
+	public void getTownByNbInhabitantsGreaterThanCsv(@PathVariable("min") Integer min,
+																  HttpServletResponse response) throws IOException, DocumentException {
+		response.setHeader("Content-Disposition", "attachment; filename=town.csv");
+		Document document = new Document(PageSize.A4);
+		PdfWriter.getInstance(document,response.getOutputStream());
+		document.open();
+		document.newPage();
+		//BaseFont baseFont = BaseFont.createFont(Base)
+		List<TownDto> townDtos = (List<TownDto>) townMapper.toDtos(townService.findByNbInhabitantsGreaterThan(min));
+		document.add(new Phrase("Town Name, Inhabitants, Department code, department Name"));
+		for (TownDto t :townDtos) {
+			Phrase phrase = new Phrase(t.getName() + "," + t.getInhabitantsNb() + "," + t.getDepartmentCode() + "," + t.getDepartmentName());
+			document.add(phrase);
+		}
+		document.close();
+		response.flushBuffer();
+	}
 
 }
